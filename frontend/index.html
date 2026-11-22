@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ROBO PET — AI-Powered Robotic Companion</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/robot.css">
+  <link rel="stylesheet" href="css/chat.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="app-background-glow"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-icon-wrapper" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7.5 13A2.5 2.5 0 0 0 5 15.5 2.5 2.5 0 0 0 7.5 18a2.5 2.5 0 0 0 2.5-2.5A2.5 2.5 0 0 0 7.5 13m9 0a2.5 2.5 0 0 0-2.5 2.5 2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0 2.5-2.5 2.5 2.5 0 0 0-2.5-2.5Z"/>
+          </svg>
+        </div>
+        <div class="brand-title">
+          <span class="brand-name">ROBO PET</span>
+          <span class="brand-subtitle">AI Companion</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Status Indicator Pill -->
+        <div id="connection-status-pill" class="status-pill status-demo" role="status" aria-label="Connection Status">
+          <span class="status-dot"></span>
+          <span class="status-text">Demo Mode</span>
+        </div>
+
+        <!-- Info / Telemetry Toggle -->
+        <button id="btn-info-toggle" class="icon-btn" title="Device Information & Telemetry" aria-label="Device Info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+        </button>
+
+        <!-- Capabilities Browser -->
+        <button id="btn-capabilities" class="icon-btn" title="Robot Capabilities & Commands" aria-label="Capabilities">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </button>
+
+        <!-- Clear Chat -->
+        <button id="btn-clear-chat" class="icon-btn" title="Clear Chat History" aria-label="Clear Chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+
+        <!-- Settings -->
+        <button id="btn-settings" class="icon-btn" title="Settings" aria-label="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Info / Telemetry Drawer -->
+    <aside id="info-panel" class="info-panel" aria-label="Device Telemetry">
+      <div class="info-panel-header">
+        <div class="info-panel-title">
+          <span>⚡ System & Sensors</span>
+        </div>
+        <button id="btn-info-close" class="icon-btn" aria-label="Close Info Panel" style="padding: 4px;">✕</button>
+      </div>
+      <div class="info-panel-body">
+        <div class="telemetry-row">
+          <div class="telemetry-label">🕒 Local Time</div>
+          <div id="info-time-val" class="telemetry-val">--:--:--</div>
+        </div>
+        <div class="telemetry-row">
+          <div class="telemetry-label">📅 Date</div>
+          <div id="info-date-val" class="telemetry-val">---</div>
+        </div>
+        <div class="telemetry-row">
+          <div class="telemetry-label">🌡️ Temperature</div>
+          <div id="info-temp-val" class="telemetry-val val-unavailable">-- °C (Unavailable)</div>
+        </div>
+        <div class="telemetry-row">
+          <div class="telemetry-label">📏 Obstacle Range</div>
+          <div id="info-dist-val" class="telemetry-val val-unavailable">-- cm (Unavailable)</div>
+        </div>
+        <div class="telemetry-row">
+          <div class="telemetry-label">🔋 Battery Level</div>
+          <div id="info-battery-val" class="telemetry-val">88%</div>
+        </div>
+        <div class="telemetry-row">
+          <div class="telemetry-label">🔌 ESP32 Link</div>
+          <div id="info-esp32-status" class="telemetry-val">
+            <span class="status-chip success">ESP32 Linked</span>
+          </div>
+        </div>
+        <div class="telemetry-row">
+          <div class="telemetry-label">⏱️ Active Timer</div>
+          <div id="info-timer-val" class="telemetry-val">None active</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace (Desktop Split / Mobile Stack) -->
+    <main class="main-workspace">
+      <!-- Companion Pane (Avatar + Emotion) -->
+      <section class="companion-pane" aria-label="Robot Companion">
+        <div class="robot-companion-container">
+          <!-- Interactive 2D Avatar Stage -->
+          <div id="robot-avatar-stage" class="robot-avatar-stage emotion-neutral" title="Click to interact with ROBO PET!">
+            <svg class="robot-svg-wrapper" viewBox="0 0 100 100">
+              <!-- Definitions for linear & radial gradients -->
+              <defs>
+                <linearGradient id="body-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#1e293b" />
+                  <stop offset="100%" stop-color="#0f172a" />
+                </linearGradient>
+                <linearGradient id="visor-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#080e1a" />
+                  <stop offset="100%" stop-color="#020617" />
+                </linearGradient>
+              </defs>
+
+              <!-- Robot Head and Torso Group -->
+              <g class="robot-head-group">
+                <!-- Dual Antennae -->
+                <line x1="32" y1="20" x2="26" y2="6" stroke="#475569" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="26" cy="6" r="4" class="antenna-light" />
+
+                <line x1="68" y1="20" x2="74" y2="6" stroke="#475569" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="74" cy="6" r="4" class="antenna-light" />
+
+                <!-- Left Ear Speaker / Sensor -->
+                <rect x="4" y="32" width="8" height="26" rx="4" class="ear-sensor" />
+                <circle cx="8" cy="45" r="4" class="ear-ring" />
+
+                <!-- Right Ear Speaker / Sensor -->
+                <rect x="88" y="32" width="8" height="26" rx="4" class="ear-sensor" />
+                <circle cx="92" cy="45" r="4" class="ear-ring" />
+
+                <!-- Robot Head Chassis -->
+                <rect x="10" y="16" width="80" height="58" rx="20" fill="url(#body-grad)" stroke="rgba(255,255,255,0.12)" stroke-width="1.8"/>
+
+                <!-- OLED Visor Glass Screen -->
+                <rect x="16" y="22" width="68" height="44" rx="14" class="visor-screen" fill="url(#visor-grad)" />
+
+                <!-- Visor Eyes Dynamic Geometry Container -->
+                <g id="robot-eyes">
+                  <!-- Rendered dynamically by robot.js -->
+                  <rect x="20" y="24" width="18" height="18" rx="8" class="eye-path neutral-path" />
+                  <rect x="62" y="24" width="18" height="18" rx="8" class="eye-path neutral-path" />
+                </g>
+
+                <!-- Small Robot Neck & Shoulders -->
+                <rect x="42" y="74" width="16" height="8" rx="2" fill="#334155" />
+                <path d="M 28 82 Q 50 86 72 82 L 78 95 Q 50 99 22 95 Z" fill="url(#body-grad)" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+                <circle cx="50" cy="89" r="2.5" fill="#38bdf8" opacity="0.8" />
+              </g>
+            </svg>
+          </div>
+
+          <!-- Emotion Pill Badge under Avatar -->
+          <div id="robot-emotion-pill" class="emotion-indicator-pill" aria-live="polite">
+            <span class="emotion-dot"></span>
+            <span class="emotion-text">🤖 Attentive</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chat Pane -->
+      <section class="chat-pane" aria-label="Conversation">
+        <!-- Messages Area -->
+        <div id="chat-messages-container" class="chat-messages-container">
+          <div id="chat-messages-list" class="chat-messages-list">
+            <!-- Messages rendered by chat.js -->
+          </div>
+
+          <!-- Typing Indicator Bubble -->
+          <div id="typing-indicator" class="chat-message-row robot-row typing-indicator-row hidden" aria-live="polite">
+            <div class="robot-avatar-mini">
+              <span class="mini-bot-icon">🤖</span>
+            </div>
+            <div class="typing-bubble">
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+              <span class="typing-dot"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Suggestion Chips Bar -->
+        <div id="chat-suggestions" class="chat-suggestions-bar">
+          <button type="button" class="suggestion-chip" data-prompt="Say hello and wave!">👋 Say Hello</button>
+          <button type="button" class="suggestion-chip" data-prompt="Can you do a robot dance for me?">💃 Dance</button>
+          <button type="button" class="suggestion-chip" data-prompt="Tell me a funny robot joke">😂 Tell a Joke</button>
+          <button type="button" class="suggestion-chip" data-prompt="What is the ambient temperature right now?">🌡️ Temperature</button>
+          <button type="button" class="suggestion-chip" data-prompt="Show me a happy expression">😊 Make Happy</button>
+          <button type="button" class="suggestion-chip" data-prompt="Give me a quick playful roast">🔥 Roast Me</button>
+        </div>
+
+        <!-- Chat Input Dock -->
+        <div class="chat-dock">
+          <form id="chat-input-form" class="chat-input-form">
+            <textarea
+              id="chat-input-field"
+              class="chat-input-field"
+              placeholder="Ask ROBO PET something, say 'dance', or ask for sensors..."
+              rows="1"
+              aria-label="Message input"></textarea>
+
+            <div class="input-controls-group">
+              <!-- Voice Output Read-Aloud Toggle -->
+              <button
+                type="button"
+                id="btn-voice-toggle"
+                class="btn-voice-toggle active"
+                title="Voice read-aloud: ON"
+                aria-label="Toggle Voice Read Aloud">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+              </button>
+
+              <!-- Speech Recognition Microphone Button -->
+              <button
+                type="button"
+                id="btn-mic"
+                class="btn-mic"
+                title="Speak using microphone"
+                aria-label="Voice input">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line x1="12" y1="19" x2="12" y2="23"></line>
+                  <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+              </button>
+
+              <!-- Send Button -->
+              <button
+                type="submit"
+                id="btn-send"
+                class="btn-send"
+                title="Send Message"
+                aria-label="Send Message">
+                <svg viewBox="0 0 24 24">
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Capabilities & Commands Modal -->
+  <div id="capabilities-modal" class="modal-container" aria-hidden="true" role="dialog">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <span>Robot Capabilities & Commands</span>
+        </div>
+        <button id="btn-capabilities-close" class="icon-btn" aria-label="Close Capabilities">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Category Filter Tabs -->
+        <div class="cap-tabs-bar">
+          <button class="cap-tab-btn active" data-category="all">All</button>
+          <button class="cap-tab-btn" data-category="emotions">Emotions</button>
+          <button class="cap-tab-btn" data-category="movements">Movements</button>
+          <button class="cap-tab-btn" data-category="conversation">Conversation</button>
+          <button class="cap-tab-btn" data-category="display">Display</button>
+          <button class="cap-tab-btn" data-category="sensors">Sensors</button>
+          <button class="cap-tab-btn" data-category="utilities">Utilities</button>
+        </div>
+
+        <!-- Capability Cards Grid -->
+        <div class="capabilities-grid">
+          <!-- EMOTIONS -->
+          <div class="capability-card" data-category="emotions" data-command="happy">
+            <div class="cap-header-line"><span class="cap-name">😊 Happy</span><span class="cap-category-badge">Emotion</span></div>
+            <p class="cap-desc">Express joy with curved glowing eyes and blush.</p>
+          </div>
+          <div class="capability-card" data-category="emotions" data-command="sad">
+            <div class="cap-header-line"><span class="cap-name">🥺 Sad</span><span class="cap-category-badge">Emotion</span></div>
+            <p class="cap-desc">Subdued expression with droopy eyes.</p>
+          </div>
+          <div class="capability-card" data-category="emotions" data-command="angry">
+            <div class="cap-header-line"><span class="cap-name">😤 Angry</span><span class="cap-category-badge">Emotion</span></div>
+            <p class="cap-desc">Fierce angled eyes with red warning visor glow.</p>
+          </div>
+          <div class="capability-card" data-category="emotions" data-command="sleepy">
+            <div class="cap-header-line"><span class="cap-name">😴 Sleepy</span><span class="cap-category-badge">Emotion</span></div>
+            <p class="cap-desc">Calm closed eyes with floating Zzz animations.</p>
+          </div>
+          <div class="capability-card" data-category="emotions" data-command="neutral">
+            <div class="cap-header-line"><span class="cap-name">🤖 Neutral</span><span class="cap-category-badge">Emotion</span></div>
+            <p class="cap-desc">Default attentive expression with natural blinking.</p>
+          </div>
+          <div class="capability-card" data-category="emotions" data-command="surprised">
+            <div class="cap-header-line"><span class="cap-name">😲 Surprised</span><span class="cap-category-badge">Emotion</span></div>
+            <p class="cap-desc">Wide circular glowing eyes with mouth ring.</p>
+          </div>
+          <div class="capability-card" data-category="emotions" data-command="confused">
+            <div class="cap-header-line"><span class="cap-name">🤔 Confused</span><span class="cap-category-badge">Emotion</span></div>
+            <p class="cap-desc">Asymmetric brows with curious tilted head.</p>
+          </div>
+
+          <!-- MOVEMENTS -->
+          <div class="capability-card" data-category="movements" data-command="dance">
+            <div class="cap-header-line"><span class="cap-name">💃 Dance</span><span class="cap-category-badge">Movement</span></div>
+            <p class="cap-desc">Triggers robotic rhythm groove and servo dance.</p>
+          </div>
+          <div class="capability-card" data-category="movements" data-command="nod">
+            <div class="cap-header-line"><span class="cap-name">👍 Nod</span><span class="cap-category-badge">Movement</span></div>
+            <p class="cap-desc">Nods head vertically in agreement.</p>
+          </div>
+          <div class="capability-card" data-category="movements" data-command="shake">
+            <div class="cap-header-line"><span class="cap-name">↔️ Shake</span><span class="cap-category-badge">Movement</span></div>
+            <p class="cap-desc">Shakes head horizontally in disagreement.</p>
+          </div>
+          <div class="capability-card" data-category="movements" data-command="look_left">
+            <div class="cap-header-line"><span class="cap-name">⬅️ Look Left</span><span class="cap-category-badge">Movement</span></div>
+            <p class="cap-desc">Swivels gaze to the left side.</p>
+          </div>
+          <div class="capability-card" data-category="movements" data-command="look_right">
+            <div class="cap-header-line"><span class="cap-name">➡️ Look Right</span><span class="cap-category-badge">Movement</span></div>
+            <p class="cap-desc">Swivels gaze to the right side.</p>
+          </div>
+          <div class="capability-card" data-category="movements" data-command="look_center">
+            <div class="cap-header-line"><span class="cap-name">🎯 Look Center</span><span class="cap-category-badge">Movement</span></div>
+            <p class="cap-desc">Re-centers head and servo orientation.</p>
+          </div>
+          <div class="capability-card" data-category="movements" data-command="wave">
+            <div class="cap-header-line"><span class="cap-name">👋 Wave</span><span class="cap-category-badge">Movement</span></div>
+            <p class="cap-desc">Friendly wave greeting motion.</p>
+          </div>
+          <div class="capability-card" data-category="movements" data-command="wiggle">
+            <div class="cap-header-line"><span class="cap-name">🐾 Wiggle</span><span class="cap-category-badge">Movement</span></div>
+            <p class="cap-desc">Playful rapid oscillation at cute capacity.</p>
+          </div>
+          <div class="capability-card" data-category="movements" data-command="stop">
+            <div class="cap-header-line"><span class="cap-name">🛑 Stop</span><span class="cap-category-badge">Movement</span></div>
+            <p class="cap-desc">Immediately halts any active servo movement.</p>
+          </div>
+
+          <!-- CONVERSATION -->
+          <div class="capability-card" data-category="conversation" data-command="greet">
+            <div class="cap-header-line"><span class="cap-name">👋 Greet</span><span class="cap-category-badge">Chat</span></div>
+            <p class="cap-desc">Introduce ROBO PET with a friendly greeting.</p>
+          </div>
+          <div class="capability-card" data-category="conversation" data-command="tell_joke">
+            <div class="cap-header-line"><span class="cap-name">😂 Tell Joke</span><span class="cap-category-badge">Chat</span></div>
+            <p class="cap-desc">Share a clean, amusing robotics joke.</p>
+          </div>
+          <div class="capability-card" data-category="conversation" data-command="encourage">
+            <div class="cap-header-line"><span class="cap-name">✨ Encourage</span><span class="cap-category-badge">Chat</span></div>
+            <p class="cap-desc">Uplifting positive companion reinforcement.</p>
+          </div>
+          <div class="capability-card" data-category="conversation" data-command="compliment">
+            <div class="cap-header-line"><span class="cap-name">💝 Compliment</span><span class="cap-category-badge">Chat</span></div>
+            <p class="cap-desc">Pay a sincere robotic compliment.</p>
+          </div>
+          <div class="capability-card" data-category="conversation" data-command="tell_fact">
+            <div class="cap-header-line"><span class="cap-name">🧠 Tell Fact</span><span class="cap-category-badge">Chat</span></div>
+            <p class="cap-desc">Interesting trivia about robotics and AI.</p>
+          </div>
+          <div class="capability-card" data-category="conversation" data-command="roast_playfully">
+            <div class="cap-header-line"><span class="cap-name">🔥 Playful Roast</span><span class="cap-category-badge">Chat</span></div>
+            <p class="cap-desc">Lighthearted robotic banter.</p>
+          </div>
+          <div class="capability-card" data-category="conversation" data-command="quiet_mode">
+            <div class="cap-header-line"><span class="cap-name">🤫 Quiet Mode</span><span class="cap-category-badge">Chat</span></div>
+            <p class="cap-desc">Mutes robotic speech synthesis.</p>
+          </div>
+
+          <!-- DISPLAY -->
+          <div class="capability-card" data-category="display" data-command="show_time">
+            <div class="cap-header-line"><span class="cap-name">🕒 Show Time</span><span class="cap-category-badge">Display</span></div>
+            <p class="cap-desc">Draw current clock on ESP32 OLED.</p>
+          </div>
+          <div class="capability-card" data-category="display" data-command="show_date">
+            <div class="cap-header-line"><span class="cap-name">📅 Show Date</span><span class="cap-category-badge">Display</span></div>
+            <p class="cap-desc">Display calendar date on physical screen.</p>
+          </div>
+          <div class="capability-card" data-category="display" data-command="show_temperature">
+            <div class="cap-header-line"><span class="cap-name">🌡️ Show Temp</span><span class="cap-category-badge">Display</span></div>
+            <p class="cap-desc">Display ambient degrees on robot display.</p>
+          </div>
+          <div class="capability-card" data-category="display" data-command="show_distance">
+            <div class="cap-header-line"><span class="cap-name">📏 Show Distance</span><span class="cap-category-badge">Display</span></div>
+            <p class="cap-desc">Display obstacle reading on OLED.</p>
+          </div>
+
+          <!-- SENSORS -->
+          <div class="capability-card" data-category="sensors" data-command="read_temperature" data-hardware-pending="true">
+            <div class="cap-header-line"><span class="cap-name">🌡️ Read Temp</span><span class="cap-category-badge">Sensor</span></div>
+            <p class="cap-desc">Query DHT/analog temperature sensor.</p>
+            <span class="cap-badge-pending">Hardware: ESP32</span>
+          </div>
+          <div class="capability-card" data-category="sensors" data-command="read_distance" data-hardware-pending="true">
+            <div class="cap-header-line"><span class="cap-name">📏 Read Distance</span><span class="cap-category-badge">Sensor</span></div>
+            <p class="cap-desc">Ping ultrasonic distance sensor.</p>
+            <span class="cap-badge-pending">Hardware: ESP32</span>
+          </div>
+          <div class="capability-card" data-category="sensors" data-command="check_environment" data-hardware-pending="true">
+            <div class="cap-header-line"><span class="cap-name">🌍 Environment</span><span class="cap-category-badge">Sensor</span></div>
+            <p class="cap-desc">Comprehensive telemetry diagnostics.</p>
+            <span class="cap-badge-pending">Hardware: ESP32</span>
+          </div>
+
+          <!-- UTILITIES -->
+          <div class="capability-card" data-category="utilities" data-command="reset_expression">
+            <div class="cap-header-line"><span class="cap-name">🔄 Reset Expression</span><span class="cap-category-badge">Utility</span></div>
+            <p class="cap-desc">Restore avatar to neutral baseline.</p>
+          </div>
+          <div class="capability-card" data-category="utilities" data-command="show_battery">
+            <div class="cap-header-line"><span class="cap-name">🔋 Show Battery</span><span class="cap-category-badge">Utility</span></div>
+            <p class="cap-desc">Check robot battery percentage.</p>
+          </div>
+          <div class="capability-card" data-category="utilities" data-command="status">
+            <div class="cap-header-line"><span class="cap-name">📋 Status Check</span><span class="cap-category-badge">Utility</span></div>
+            <p class="cap-desc">Full diagnostics report of robot subsystems.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal-container" aria-hidden="true" role="dialog">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <span>Preferences & Backend Settings</span>
+        </div>
+        <button id="btn-settings-close" class="icon-btn" aria-label="Close Settings">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Demo Mode Toggle -->
+        <div class="setting-switch-row">
+          <div class="setting-switch-info">
+            <div class="setting-switch-title">Demo / Mock Mode</div>
+            <div class="setting-switch-desc">Preview conversational responses and animations without running Flask or ESP32.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="settings-demo-mode-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Backend URL Configuration -->
+        <div class="setting-group">
+          <label for="settings-backend-url" class="setting-label">Flask Backend Server URL</label>
+          <div class="setting-input-row">
+            <input type="text" id="settings-backend-url" class="setting-text-input" placeholder="http://localhost:5000" value="http://localhost:5000">
+            <button type="button" id="btn-test-backend-conn" class="btn-secondary">Test Link</button>
+          </div>
+          <div id="backend-test-status" style="font-size: 0.78rem; margin-top: 4px;"></div>
+        </div>
+
+        <!-- Voice Output Toggle -->
+        <div class="setting-switch-row">
+          <div class="setting-switch-info">
+            <div class="setting-switch-title">Voice Output (Read Aloud)</div>
+            <div class="setting-switch-desc">Speak robot responses aloud using natural browser speech synthesis.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="settings-voice-output-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Sound Effects Toggle -->
+        <div class="setting-switch-row">
+          <div class="setting-switch-info">
+            <div class="setting-switch-title">Sound Effects (Bleeps & Chimes)</div>
+            <div class="setting-switch-desc">Synthesized robotic audio for clicks, movements, and emotion changes.</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="settings-sound-effects-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Voice Selection -->
+        <div class="setting-group">
+          <label for="settings-voice-select" class="setting-label">Synthesizer Voice</label>
+          <div class="setting-input-row">
+            <select id="settings-voice-select" class="setting-select">
+              <option value="">Default (Natural Robot Voice)</option>
+            </select>
+            <button type="button" id="btn-test-voice" class="btn-secondary">Preview</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="btn-save-settings" class="btn-primary">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Core JavaScript Modules -->
+  <script src="js/state.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/robot.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
