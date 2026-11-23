@@ -1,156 +1,165 @@
-# 🤖 ROBO PET — AI-Powered Robotic Companion Frontend
+# 🤖 ROBO PET — AI-Powered Robotic Companion (Full Stack)
 
-> Modern, responsive, single-page web chatbot interface and 2D animated avatar for **ROBO PET**, a personal AI-powered robotic companion driven by ESP32, Python (Flask), and Google Gemini API.
+> Modern, responsive, single-page web interface, Python Flask backend with Google Gemini AI integration, and ESP32 dual-servo microcontroller firmware for **ROBO PET**, your personal AI-powered robotic companion.
 
 ---
 
 ## 📖 Table of Contents
 1. [Overview & Architecture](#-overview--architecture)
-2. [Key Features](#-key-features)
-3. [Design Philosophy](#-design-philosophy)
-4. [File Structure](#-file-structure)
-5. [Getting Started & Running the Frontend](#-getting-started--running-the-frontend)
-6. [Backend API Integration Contract](#-backend-api-integration-contract)
-7. [Robot Command Registry](#-robot-command-registry)
-8. [Voice & Speech Capabilities](#-voice--speech-capabilities)
-9. [Demo Mode](#-demo-mode)
-10. [Hardware & Architecture Safety Rules](#-hardware--architecture-safety-rules)
+2. [Full System Structure](#-full-system-structure)
+3. [Quick Start & Running the Project](#-quick-start--running-the-project)
+4. [Backend Architecture & Modules](#-backend-architecture--modules)
+5. [Gemini AI Integration & Safety](#-gemini-ai-integration--safety)
+6. [Hardware & ESP32 Firmware](#-hardware--esp32-firmware)
+7. [REST API Contract](#-rest-api-contract)
+8. [Automated Testing](#-automated-testing)
+9. [Command Registry](#-command-registry)
 
 ---
 
 ## 🌟 Overview & Architecture
 
-ROBO PET is a physical robotic companion controlled via a modern web interface. Users interact using voice or text. The Flask backend coordinates with the Google Gemini API to produce conversational responses, emotional expressions, and physical servo commands sent across serial communication to an ESP32 microcontroller.
+ROBO PET is a physical robotic companion controlled via a modern web interface with voice and text. The Python Flask backend coordinates with Google's Gemini API to produce conversational responses, emotional expressions, and physical servo commands sent across serial communication to an ESP32 microcontroller.
 
 ```
 ┌────────────────────────────────────────────────────────┐
 │               ROBO PET Frontend (Web UI)               │
-│  - 2D Animated Avatar (Emotions & Movements)           │
-│  - Conversational Chat Interface                       │
-│  - Web Speech STT & SpeechSynthesis TTS                │
+│  - 2D Animated Avatar (7 Emotions & 9 Movements)       │
+│  - Conversational Chat Interface & Speech STT / TTS    │
 │  - Telemetry & System Status Panel                     │
 └───────────────────────────┬────────────────────────────┘
-                            │ HTTP JSON API
+                            │ HTTP JSON API (Port 5000)
                             ▼
 ┌────────────────────────────────────────────────────────┐
 │               Python / Flask Backend                   │
-│  - Google Gemini API (LLM conversational engine)       │
-│  - Validated Command Registry                          │
-│  - Serial Communication Manager (USB / UART)           │
+│  - Google Gemini API (Structured JSON Generation)      │
+│  - Strict Command Validator (Prevent Arbitrary Exec)   │
+│  - Serial Communication & Virtual Hardware Simulation  │
+│  - Sensor Telemetry Cache & Independent Timer Manager  │
 └───────────────────────────┬────────────────────────────┘
-                            │ Serial / UART Commands
+                            │ Serial JSON Protocol (115200 Baud)
                             ▼
 ┌────────────────────────────────────────────────────────┐
 │               ESP32 Microcontroller Robot              │
-│  - OLED Display (Faces, Eyes & Info)                   │
-│  - Servo Motors (Head nod, shake, dance, wave)         │
-│  - Sensors (Ultrasonic Distance, Temperature DHT)      │
-│  - Indicator LEDs & Piezo Speaker                      │
+│  - Dual SG90 Servos (Pan / Tilt with Easing & Limits)  │
+│  - SSD1306 OLED (Facial Expressions & Info Screen)     │
+│  - HC-SR04 Ultrasonic Sensor & Ambient Temperature     │
+│  - Piezo Buzzer Synthesizer                            │
 └────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## ✨ Key Features
-
-- **Cute 2D Animated Robot Avatar**:
-  - Visually responds to emotions: `happy`, `sad`, `angry`, `sleepy`, `neutral`, `surprised`, `confused`.
-  - Performs physical movements: `dance`, `nod`, `shake`, `look_left`, `look_right`, `look_center`, `wave`, `wiggle`, `stop`.
-  - Natural blinking cycle and breathing idle animation.
-  - Interactive tactile reaction: clicking the robot gives a playful chirp and wiggle!
-  - Integrated Web Audio API synthesizer for robotic sound effects and bleeps without external dependencies.
-- **Conversational Chatbot**:
-  - Right-aligned user bubbles with gradient styling.
-  - Left-aligned robot responses with avatar badge and structured action execution tags (e.g. `⚡ Action: Dance`).
-  - Timestamps, auto-scroll with scroll-lock detection, and 3-dot typing indicator.
-  - Session-based temporary memory (no persistent DB required).
-- **Voice Interaction**:
-  - **Speech-to-Text (STT)**: Microphone button captures browser voice using Web Speech Recognition with live transcript and pulsing ring indicator.
-  - **Text-to-Speech (TTS)**: Built-in speech synthesis reads robot responses aloud with custom robot pitch.
-- **Telemetry & Hardware Status Drawer**:
-  - Live clock & date.
-  - Real-time temperature & obstacle distance readings (with explicit `-- (Unavailable)` state when sensors or ESP32 are offline).
-  - ESP32 connection badge and battery status.
-- **Capabilities & Quick Action Modal**:
-  - Browse and trigger all 6 categories of robot capabilities (Emotions, Movements, Conversation, Display, Sensors, Utilities).
-  - Clear hardware-pending badges for features requiring physical sensors.
-- **Zero-Setup Demo Mode**:
-  - Built-in mock simulator to test the complete UI, animations, voice, and commands out of the box without requiring Flask or ESP32 running.
-
----
-
-## 🎨 Design Philosophy
-
-- **Color Palette**: Dark navy / charcoal background (`#080d1a`, `#0f172a`), soft electric-blue accents (`#38bdf8`), cyan glows, and violet undertones.
-- **Typography**: Clean, modern sans-serif (`Outfit`, `Inter`).
-- **Look & Feel**: Premium AI chatbot with a friendly robotic companion personality—no cluttered admin dashboards or harsh neon.
-- **Mobile First**: Fluidly adapts from mobile screens up to 4K desktops.
-
----
-
-## 📁 File Structure
+## 📁 Full System Structure
 
 ```
 ROBO-PET/
-├── index.html                  # Root launcher redirect to frontend/index.html
-├── README.md                   # Complete documentation & API contracts
-└── frontend/
-    ├── index.html              # Main single-page web app
-    ├── css/
-    │   ├── style.css           # Base variables, layout, grid & theme
-    │   ├── robot.css           # 2D avatar SVG styling, emotions & movement keyframes
-    │   ├── chat.css            # Chat bubbles, typing indicator & input dock
-    │   └── components.css      # Modals, telemetry drawer, switches & toasts
-    └── js/
-        ├── state.js            # Centralized reactive state store
-        ├── api.js              # Centralized API service & Mock Demo engine
-        ├── robot.js            # 2D avatar controller & Web Audio sound synthesizer
-        ├── voice.js            # Web Speech STT and SpeechSynthesis TTS controller
-        ├── chat.js             # Chat timeline, rendering & suggestion chips
-        └── app.js              # Main application initialization & lifecycle
+├── backend/
+│   ├── app.py                  # Flask server, CORS, API routes & frontend serving
+│   ├── config.py               # Centralized configuration & environment loader
+│   ├── commands.json           # Validated registry of emotions, movements & commands
+│   ├── validator.py            # Strict validator for manual & AI-generated commands
+│   ├── gemini_service.py       # Google Gemini AI client & fallback companion engine
+│   ├── robot_controller.py     # Robot state, command dispatcher & alert coordinator
+│   ├── serial_manager.py       # ESP32 USB serial connection & virtual simulation
+│   ├── sensor_manager.py       # Sensor telemetry parser & cache
+│   ├── timer_manager.py        # Independent background countdown timer manager
+│   ├── requirements.txt        # Python package dependencies
+│   ├── .env.example            # Environment variables template
+│   └── tests/                  # Automated pytest suite (21 unit & integration tests)
+│       ├── test_api.py         # Tests Flask HTTP endpoints
+│       ├── test_gemini.py      # Tests Gemini prompt & fallback engine
+│       ├── test_timer.py       # Tests countdown timer lifecycle
+│       └── test_validator.py   # Tests command, emotion & schema validation
+├── firmware/
+│   ├── README.md               # ESP32 pinout diagram, libraries & flashing guide
+│   └── robo_pet_esp32/
+│       └── robo_pet_esp32.ino  # Production-ready Arduino/ESP32 C++ firmware
+├── frontend/
+│   ├── index.html              # Main single-page web app
+│   ├── css/                    # Styles (style.css, robot.css, chat.css, components.css)
+│   └── js/                     # Client scripts (state.js, api.js, robot.js, voice.js, chat.js, app.js)
+├── index.html                  # Root launcher redirect
+└── README.md                   # Complete system documentation
 ```
 
 ---
 
-## 🚀 Getting Started & Running the Frontend
+## 🚀 Quick Start & Running the Project
 
-No build step or Node dependencies are required. The frontend runs directly in any modern web browser.
-
-### Option A: Using Python's built-in HTTP server (Recommended)
+### 1. Configure Environment (Optional for Gemini)
 ```bash
-# From the project root (c:\Users\ASUS\OneDrive\Documents\ROBO-PET):
-python -m http.server 8000
+# In the project directory:
+cp backend/.env.example .env
 ```
-Open your browser at:
+Edit `.env` and set your Google Gemini API key:
+```env
+GEMINI_API_KEY=your_actual_gemini_api_key_here
+FLASK_PORT=5000
+SERIAL_PORT=AUTO
 ```
-http://localhost:8000
-```
+*(Note: If no API key is provided, ROBO PET automatically runs in intelligent companion fallback mode with full conversation, jokes, dances, and emotions!)*
 
-### Option B: Using Node.js `serve` / `npx`
+### 2. Start the Backend Server
 ```bash
-npx serve .
+python backend/app.py
 ```
+This starts the Flask server on **`http://localhost:5000`**. Because the backend automatically serves the frontend, you can simply open:
+👉 **[http://localhost:5000](http://localhost:5000)** in your browser!
 
-### Option C: Direct File Opening
-Double-click `frontend/index.html` or `index.html` in your file explorer to open it in Chrome, Edge, Safari, or Firefox.
-
-*(Note: Speech Recognition requires an `http://` or `https://` origin in certain browsers, so running with `python -m http.server` is recommended for full microphone features).*
+### 3. Connect to Backend from Frontend
+- The frontend connects automatically to `http://localhost:5000`.
+- To toggle between **Demo Mode** (local browser mock) and **Live Backend Mode**, click the status pill in the top-right header or open the **Settings (⚙️)** modal.
 
 ---
 
-## 🔌 Backend API Integration Contract
+## 🧠 Gemini AI Integration & Safety
 
-The frontend communicates with a Python / Flask backend using a centralized API module in `frontend/js/api.js`. The backend URL can be configured anytime in the **Settings Modal** (defaults to `http://localhost:5000`).
+1. **System Persona**: ROBO PET acts as a loyal, curious, cheerful, and expressive desktop companion.
+2. **Structured JSON Output**: Gemini is instructed to output strictly typed JSON:
+   ```json
+   {
+     "response": "Watch my signature dance groove!",
+     "emotion": "happy",
+     "action": "dance",
+     "display_action": null,
+     "utility_action": null
+   }
+   ```
+3. **Strict Validation Barrier**:
+   - The AI **cannot** execute arbitrary shell commands, raw code, or unvalidated hardware actions.
+   - All AI output passes through `backend/validator.py`. Only pre-registered emotions and servo movements are accepted.
+   - Unknown actions are discarded and emotions default to `neutral`.
+4. **API Key Protection**: The Gemini API key is stored strictly on the backend in environment variables and is never transmitted to client-side JavaScript.
 
-### 1. `POST /talk`
-Sends the user's conversational message.
-- **Request Body**:
-  ```json
-  {
-    "message": "Can you dance and wave for me?"
-  }
-  ```
-- **Response Format**:
+---
+
+## 🤖 Hardware & ESP32 Firmware
+
+ROBO PET uses an ESP32 microcontroller with:
+- **Dual SG90 Servos**:
+  - **Pan Servo (Yaw)**: Pin GPIO 18 (safe limits: 10°–170°, center 90°)
+  - **Tilt Servo (Pitch)**: Pin GPIO 19 (safe limits: 40°–140°, center 90°)
+  - Smooth software easing prevents gear stripping.
+- **SSD1306 128x64 OLED Display**:
+  - Connected via I2C (SDA: GPIO 21, SCL: GPIO 22).
+  - Displays expressive digital eyes matching the 7 emotions (`happy`, `sad`, `angry`, `sleepy`, `neutral`, `surprised`, `confused`) and information screens.
+- **Sensors**:
+  - Ultrasonic Distance Sensor HC-SR04 (Trig: GPIO 5, Echo: GPIO 4).
+  - Temperature sensing and battery telemetry.
+- **Piezo Buzzer**: Pin GPIO 23 for synthesized melodic chirps.
+
+See [firmware/README.md](file:///c:/Users/ASUS/OneDrive/Documents/ROBO-PET/firmware/README.md) for complete pinout and flashing instructions.
+
+---
+
+## 🔌 REST API Contract
+
+The Python Flask backend preserves the exact contract required by the existing frontend:
+
+### `POST /talk`
+- **Request Body**: `{"message": "Can you dance and wave?"}`
+- **Response (200 OK)**:
   ```json
   {
     "response": "Watch my moves! (*grooving happily*)",
@@ -160,34 +169,28 @@ Sends the user's conversational message.
   }
   ```
 
-### 2. `GET /status`
-Checks the health of the Flask server, ESP32 link, and available hardware sensors.
-- **Response Format**:
+### `GET /status`
+- **Response (200 OK)**:
   ```json
   {
     "status": "online",
     "esp32_connected": true,
-    "battery": 92,
+    "hardware_mode": "physical",
+    "battery": 88,
     "sensors": {
       "temperature": 24.5,
       "distance": 42
     },
     "timer": {
-      "active": false
+      "active": false,
+      "remaining": 0
     }
   }
   ```
 
-### 3. `POST /command`
-Sends a validated manual command to the robot.
-- **Request Body**:
-  ```json
-  {
-    "command": "dance",
-    "category": "movements"
-  }
-  ```
-- **Response Format**:
+### `POST /command`
+- **Request Body**: `{"command": "dance", "category": "movements"}`
+- **Response (200 OK)**:
   ```json
   {
     "success": true,
@@ -197,62 +200,48 @@ Sends a validated manual command to the robot.
   }
   ```
 
-### 4. `POST /timer`
-Manages timer countdowns displayed on the robot.
-- **Request Body**:
+### `POST /timer`
+- **Request Body**: `{"action": "set", "duration": 300, "label": "Pomodoro"}`
+- **Response (200 OK)**:
   ```json
   {
-    "action": "set",
-    "duration": 300,
-    "label": "Focus Timer"
+    "success": true,
+    "message": "Timer set for 300 seconds (Pomodoro).",
+    "timer": {
+      "active": true,
+      "duration": 300,
+      "remaining": 300,
+      "label": "Pomodoro"
+    }
   }
   ```
 
 ---
 
-## 📋 Robot Command Registry
+## 🧪 Automated Testing
 
-The backend maintains a validated command registry. The frontend supports:
+The backend includes a comprehensive automated test suite in `backend/tests/`:
 
-| Category | Commands |
+```bash
+# Run all tests:
+python -m pytest backend/tests
+```
+
+**Test Coverage**:
+- `test_validator.py`: Command registry lookup, emotion sanitization, safety restrictions.
+- `test_gemini.py`: Prompt generation, fallback companion engine, context history.
+- `test_timer.py`: Timer start, countdown ticker, expiration alert callback, cancellation.
+- `test_api.py`: Full Flask test client coverage for `/health`, `/status`, `/talk`, `/command`, `/timer`.
+
+---
+
+## 📋 Command Registry
+
+| Category | Registered Commands |
 |---|---|
 | **Emotions** | `happy`, `sad`, `angry`, `sleepy`, `neutral`, `surprised`, `confused` |
-| **Movements** | `dance`, `nod`, `shake`, `look_left`, `look_right`, `look_center`, `stop`, `wave`, `wiggle` |
+| **Movements** | `dance`, `nod`, `shake`, `look_left`, `look_right`, `look_center`, `wave`, `wiggle`, `stop` |
 | **Conversation** | `chat`, `greet`, `tell_joke`, `encourage`, `goodbye`, `compliment`, `tell_fact`, `roast_playfully`, `quiet_mode` |
 | **Display** | `show_time`, `show_date`, `show_datetime`, `show_temperature`, `show_distance`, `show_sensor_status` |
-| **Sensors** | `read_temperature`, `read_distance`, `check_environment` *(flagged as hardware-pending if ESP32 offline)* |
+| **Sensors** | `read_temperature`, `read_distance`, `check_environment` |
 | **Utilities** | `status`, `reset_expression`, `show_battery` |
-
----
-
-## 🎙️ Voice & Speech Capabilities
-
-1. **Microphone (Speech Recognition)**:
-   - Click the microphone icon to begin speech recognition.
-   - The microphone pulses with concentric glowing rings while listening.
-   - Live speech transcript is inserted directly into the chat input bar.
-   - Handles permissions and unsupported browser environments gracefully.
-2. **Voice Output (Speech Synthesis)**:
-   - Toggle on/off via the speaker button in the chat input bar or in Settings.
-   - Automatically reads incoming robot responses aloud.
-   - Configurable voice selection, rate, and pitch in the Settings modal.
-   - Synchronizes robot avatar visor/ear waveform glow while speaking.
-
----
-
-## 🧪 Demo Mode
-
-To allow rapid frontend development and user demonstrations before the hardware ESP32 is wired up, **Demo Mode** is enabled by default:
-- Simulates realistic AI responses to common prompts (greetings, jokes, dance requests, roasts, facts, sensor queries).
-- Simulates realistic network latency (300ms–800ms) to test typing indicators.
-- Emits realistic sensor telemetry.
-- Can be toggled on/off at any time in **Settings** or by clicking the status pill in the header.
-
----
-
-## 🛡️ Hardware & Architecture Safety Rules
-
-1. **No Frontend API Keys**: Google Gemini API keys are never stored in or accessed by client-side code.
-2. **No Direct ESP32 Access**: The browser never attempts direct serial communication with the microcontroller. All communication passes through the validated Python Flask backend.
-3. **No Arbitrary Commands**: Gemini cannot execute unvalidated commands. The Python backend validates every command against the Command Registry before forwarding to the ESP32.
-4. **Temporary Session History**: Chat logs and interaction states remain in transient browser memory without persisting unauthorized data.

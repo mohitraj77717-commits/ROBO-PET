@@ -1,0 +1,102 @@
+{
+  "emotions": {
+    "happy": { "description": "Express joy, smiling OLED eyes and energetic posture", "default_action": "wiggle" },
+    "sad": { "description": "Subdued mood with drooping eyes and lowered head", "default_action": "nod" },
+    "angry": { "description": "Fierce expression with red alert glow and sharp eyebrows", "default_action": "shake" },
+    "sleepy": { "description": "Closed eyes with slow breathing and power-saving posture", "default_action": "stop" },
+    "neutral": { "description": "Default attentive posture with periodic natural blinking", "default_action": "look_center" },
+    "surprised": { "description": "Wide circular glowing eyes and raised head", "default_action": "look_center" },
+    "confused": { "description": "Asymmetrical eyes with curious tilted head", "default_action": "look_right" }
+  },
+  "movements": {
+    "dance": {
+      "description": "Rhythmic groove routine using dual servos",
+      "servo_routine": "dance",
+      "duration_sec": 3.0,
+      "requires_hardware": true
+    },
+    "nod": {
+      "description": "Pitch head up and down in affirmation",
+      "servo_routine": "nod",
+      "duration_sec": 1.5,
+      "requires_hardware": true
+    },
+    "shake": {
+      "description": "Yaw head left and right in disagreement",
+      "servo_routine": "shake",
+      "duration_sec": 1.5,
+      "requires_hardware": true
+    },
+    "look_left": {
+      "description": "Turn yaw servo towards the left",
+      "servo_routine": "look_left",
+      "target_pan": 135,
+      "target_tilt": 90,
+      "duration_sec": 1.0,
+      "requires_hardware": true
+    },
+    "look_right": {
+      "description": "Turn yaw servo towards the right",
+      "servo_routine": "look_right",
+      "target_pan": 45,
+      "target_tilt": 90,
+      "duration_sec": 1.0,
+      "requires_hardware": true
+    },
+    "look_center": {
+      "description": "Re-center both servos to neutral baseline",
+      "servo_routine": "look_center",
+      "target_pan": 90,
+      "target_tilt": 90,
+      "duration_sec": 0.8,
+      "requires_hardware": true
+    },
+    "wave": {
+      "description": "Playful side-to-side greeting motion",
+      "servo_routine": "wave",
+      "duration_sec": 2.0,
+      "requires_hardware": true
+    },
+    "wiggle": {
+      "description": "Rapid oscillation showing excitement or joy",
+      "servo_routine": "wiggle",
+      "duration_sec": 1.8,
+      "requires_hardware": true
+    },
+    "stop": {
+      "description": "Immediately halt all active servo routines",
+      "servo_routine": "stop",
+      "duration_sec": 0.1,
+      "requires_hardware": true
+    }
+  },
+  "conversation": {
+    "chat": { "description": "General conversational response" },
+    "greet": { "description": "Friendly greeting to user" },
+    "tell_joke": { "description": "Tell a clean, funny robotics or tech joke" },
+    "encourage": { "description": "Uplifting and motivational words" },
+    "goodbye": { "description": "Farewell message before idling or sleeping" },
+    "compliment": { "description": "Heartwarming compliment for the user" },
+    "tell_fact": { "description": "Share an intriguing AI, science, or robotics fact" },
+    "roast_playfully": { "description": "Lighthearted, gentle robotic banter" },
+    "quiet_mode": { "description": "Quiet conversational mode without loud audio chimes" }
+  },
+  "display": {
+    "show_time": { "description": "Display current digital clock on OLED", "screen_mode": "time" },
+    "show_date": { "description": "Display current calendar date on OLED", "screen_mode": "date" },
+    "show_datetime": { "description": "Display combined time and date on OLED", "screen_mode": "datetime" },
+    "show_temperature": { "description": "Display ambient sensor temperature on OLED", "screen_mode": "temperature" },
+    "show_distance": { "description": "Display ultrasonic obstacle distance on OLED", "screen_mode": "distance" },
+    "show_sensor_status": { "description": "Display comprehensive telemetry on OLED", "screen_mode": "sensors" }
+  },
+  "sensors": {
+    "read_temperature": { "description": "Sample ambient temperature sensor", "sensor": "temperature", "requires_hardware": true },
+    "read_distance": { "description": "Sample HC-SR04 ultrasonic distance sensor", "sensor": "distance", "requires_hardware": true },
+    "check_environment": { "description": "Comprehensive scan of all active sensors", "sensor": "all", "requires_hardware": true }
+  },
+  "utilities": {
+    "status": { "description": "Report comprehensive backend and hardware diagnostics" },
+    "reset_expression": { "description": "Restore OLED face and avatar expression to neutral" },
+    "show_battery": { "description": "Report current battery state of charge" }
+  }
+}
