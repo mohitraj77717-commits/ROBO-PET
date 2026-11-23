@@ -13,7 +13,7 @@ FRONTEND_DIR = PROJECT_ROOT / "frontend"
 env_path = PROJECT_ROOT / ".env"
 if not env_path.exists():
     env_path = BACKEND_DIR / ".env"
-load_dotenv(dotenv_path=env_path)
+load_dotenv(dotenv_path=env_path, override=True)
 
 class Config:
     # Flask Settings
