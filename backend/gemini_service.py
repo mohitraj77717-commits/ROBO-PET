@@ -117,16 +117,25 @@ class GeminiService:
             response_mime_type="application/json"
         )
 
-        response = self.client.models.generate_content(
-            model=self.model_name,
-            contents=prompt,
-            config=config
-        )
+        models_to_try = [self.model_name]
+        for fallback_m in ["gemini-3.5-flash", "gemini-flash-latest", "gemini-3.8-flash"]:
+            if fallback_m not in models_to_try:
+                models_to_try.append(fallback_m)
 
-        raw_text = response.text or ""
-        parsed_json = self._parse_json(raw_text)
-        if parsed_json:
-            return validator.sanitize_ai_output(parsed_json)
+        for model in models_to_try:
+            try:
+                response = self.client.models.generate_content(
+                    model=model,
+                    contents=prompt,
+                    config=config
+                )
+                raw_text = response.text or ""
+                parsed_json = self._parse_json(raw_text)
+                if parsed_json:
+                    return validator.sanitize_ai_output(parsed_json)
+            except Exception as model_err:
+                logger.warning(f"Model '{model}' attempt failed: {model_err}")
+                continue
 
         return None
 
