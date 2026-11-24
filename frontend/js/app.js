@@ -102,7 +102,23 @@ function setupConnectionIndicator(state, api) {
 
   if (statusPill) {
     statusPill.addEventListener('click', () => {
-      openModal('settings-modal');
+      const currentDemo = state.get('demoMode');
+      const newDemo = !currentDemo;
+      state.set({ demoMode: newDemo });
+      localStorage.setItem('robopet_demo_mode', String(newDemo));
+
+      if (newDemo) {
+        window.showToast('Switched to Offline Demo / Mock Mode', 'info');
+      } else {
+        window.showToast('Connecting to Live Backend (Gemini AI)...', 'success');
+        api.getStatus().then(res => {
+          if (res.status === 'online') {
+            window.showToast('✓ Connected to Flask Backend & Gemini AI!', 'success');
+          } else {
+            window.showToast('⚠️ Backend offline. Run "python backend/app.py" in terminal.', 'warning');
+          }
+        });
+      }
     });
   }
 }

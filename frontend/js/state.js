@@ -20,10 +20,14 @@ class RobotState {
     const savedVoiceOutput = localStorage.getItem('robopet_voice_output');
     const savedSoundEffects = localStorage.getItem('robopet_sound_effects');
 
+    // If accessed via HTTP server (like Flask on port 5000), default to Live mode (demoMode: false)
+    const isServedByBackend = typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http');
+    const defaultDemo = isServedByBackend ? false : true;
+
     this._state = {
       // Connection & Backend
       backendUrl: savedBackendUrl,
-      demoMode: savedDemoMode === null ? true : savedDemoMode === 'true', // Defaults to demo mode for initial preview
+      demoMode: savedDemoMode === null ? defaultDemo : savedDemoMode === 'true',
       connectionStatus: 'disconnected', // 'online' | 'offline' | 'connecting' | 'demo'
       esp32Connected: false,
       lastPingTime: null,
