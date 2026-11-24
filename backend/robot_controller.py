@@ -61,6 +61,19 @@ class RobotController:
 
         self.serial_mgr.send_command(payload)
 
+        # Check if conversation requested setting a countdown timer
+        import re
+        user_msg = (ai_output.get("metadata", {}).get("user_message") or "").lower()
+        resp_text = (ai_output.get("response") or "").lower()
+        combined = f"{user_msg} {resp_text}"
+        timer_match = re.search(r'(?:timer|countdown)(?:\s+of|\s+for)?\s+(\d+)\s*(sec|second|min|minute)?', combined)
+        if timer_match:
+            amount = int(timer_match.group(1))
+            unit = (timer_match.group(2) or "sec").lower()
+            duration_sec = amount * 60 if "min" in unit else amount
+            if not self.timer_mgr.is_active:
+                self.timer_mgr.set_timer(duration_sec, f"{amount} {unit} Timer")
+
         return {
             "response": ai_output.get("response", ""),
             "emotion": emotion,

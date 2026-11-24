@@ -77,6 +77,9 @@ def create_app() -> Flask:
         try:
             # 1. Generate structured response with Gemini AI (or intelligent companion fallback)
             ai_result = gemini_service.generate_chat_response(user_message)
+            if "metadata" not in ai_result:
+                ai_result["metadata"] = {}
+            ai_result["metadata"]["user_message"] = user_message
 
             # 2. Forward validated physical actions/emotions to the robot hardware controller
             final_result = robot_controller.execute_ai_intent(ai_result)

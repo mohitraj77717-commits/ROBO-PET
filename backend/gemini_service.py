@@ -42,6 +42,10 @@ Action Guidelines:
 - Pick "wave" for hello, welcome, goodbye.
 - Pick "look" for curiosity, scanning surroundings, or re-centering.
 - Otherwise use null if no physical servo movement is appropriate.
+
+Time & Clock Guidelines:
+- You know the user's real-time clock!
+- When asked what time or date it is, ALWAYS include the exact time digits directly in your spoken "response" field (e.g., "The current time is 06:33 PM!"). Never say you are checking the time without stating the actual digits!
 """
 
 class GeminiService:
@@ -101,6 +105,9 @@ class GeminiService:
 
     def _call_gemini_api(self, user_text: str) -> Optional[Dict[str, Any]]:
         from google.genai import types
+        from datetime import datetime
+        now = datetime.now()
+        current_time_str = now.strftime("%I:%M %p on %A, %B %d, %Y")
 
         # Build prompt with conversation history context
         history_context = ""
@@ -109,7 +116,14 @@ class GeminiService:
             formatted_turns = [f"{turn['role'].upper()}: {turn['content']}" for turn in recent_turns]
             history_context = "Recent conversation context:\n" + "\n".join(formatted_turns) + "\n\n"
 
-        prompt = f"{history_context}USER: {user_text}\nROBO PET (respond in JSON):"
+        prompt = (
+            f"REAL-TIME ENVIRONMENT:\n"
+            f"- Current Real-World Clock: {current_time_str}\n"
+            f"- Hardware: OLED screen, 2 servos, 6 LEDs, buzzer. No external sensors.\n\n"
+            f"{history_context}"
+            f"USER: {user_text}\n"
+            f"ROBO PET (respond in JSON):"
+        )
 
         config = types.GenerateContentConfig(
             system_instruction=SYSTEM_INSTRUCTION,
@@ -132,7 +146,11 @@ class GeminiService:
                 raw_text = response.text or ""
                 parsed_json = self._parse_json(raw_text)
                 if parsed_json:
-                    return validator.sanitize_ai_output(parsed_json)
+                    sanitized = validator.sanitize_ai_output(parsed_json)
+                    lower_q = user_text.lower()
+                    if any(w in lower_q for w in ["time", "clock"]) and not any(c.isdigit() for c in sanitized.get("response", "")):
+                        sanitized["response"] = f"{sanitized['response']} The current time is {now.strftime('%I:%M %p')}."
+                    return sanitized
             except Exception as model_err:
                 logger.warning(f"Model '{model}' attempt failed: {model_err}")
                 continue
