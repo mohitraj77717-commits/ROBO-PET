@@ -4,16 +4,24 @@ class RobotState {
   constructor() {
     this._listeners = new Map();
 
-    // Compute dynamic default backend URL (works on both laptop and mobile)
-    let defaultBackend = 'http://localhost:5000';
-    if (typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http')) {
-      const port = window.location.port === '5000' || !window.location.port ? '5000' : window.location.port;
-      defaultBackend = `${window.location.protocol}//${window.location.hostname}:${port}`;
+    // Compute dynamic default backend URL (Flask backend always runs on port 5000)
+    let hostname = 'localhost';
+    let protocol = 'http:';
+    if (typeof window !== 'undefined' && window.location) {
+      if (window.location.hostname) hostname = window.location.hostname;
+      if (window.location.protocol.startsWith('http')) protocol = window.location.protocol;
     }
+    const defaultBackend = `${protocol}//${hostname}:5000`;
+
     let savedBackendUrl = localStorage.getItem('robopet_backend_url') || defaultBackend;
+    // If saved URL points to port 3000 or other static server ports, auto-correct to port 5000
+    if (savedBackendUrl.includes(':3000') || savedBackendUrl.includes(':8080') || savedBackendUrl.includes(':5500') || savedBackendUrl.includes(':8000')) {
+      savedBackendUrl = defaultBackend;
+      try { localStorage.setItem('robopet_backend_url', defaultBackend); } catch (e) {}
+    }
     // Adapt saved URL if user was previously on localhost but is now accessing from mobile via LAN IP
-    if (savedBackendUrl.includes('localhost') && typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      savedBackendUrl = savedBackendUrl.replace('localhost', window.location.hostname);
+    if (savedBackendUrl.includes('localhost') && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      savedBackendUrl = savedBackendUrl.replace('localhost', hostname);
     }
 
     const savedDemoMode = localStorage.getItem('robopet_demo_mode');

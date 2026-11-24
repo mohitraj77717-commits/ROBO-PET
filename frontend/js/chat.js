@@ -289,7 +289,7 @@ class ChatController {
     if (this.state.get('messages').length === 0) {
       this.state.addMessage({
         sender: 'robot',
-        text: "Beep boop! 🤖 Hello, I'm **ROBO PET**, your AI-powered companion! You can chat with me, ask me to dance or wave, check our environmental sensors, or talk to me using voice. How can I help you today?",
+        text: "Beep boop! 🤖 Hello, I'm **ROBO PET**, your AI-powered companion! You can chat with me, ask me to dance, look around, or wave, and talk to me using your voice. How can I help you today?",
         emotion: 'happy',
         timestamp: new Date()
       });
