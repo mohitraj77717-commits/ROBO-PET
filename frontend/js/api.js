@@ -422,6 +422,13 @@ class RobotAPI {
         action: "nod"
       };
     }
+    if (text.includes('temp') || text.includes('temperature') || text.includes('weather')) {
+      return {
+        response: "I don't have a physical temperature sensor installed in my hardware build! But I can dance, look around, wave, tell jokes, or set a timer for you.",
+        emotion: "confused",
+        action: "shake"
+      };
+    }
     if (text.includes('timer')) {
       return {
         response: "I can help with timers! You can set countdowns using the timer command or asking me to set one.",

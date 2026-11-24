@@ -284,6 +284,15 @@ class GeminiService:
                 "metadata": {"intent": "time"}
             }
 
+        if any(w in lower for w in ["temp", "temperature", "weather"]):
+            return {
+                "response": "I don't have a physical temperature sensor installed in my hardware build! But I can dance, look around, wave, tell jokes, or track timers for you.",
+                "emotion": "confused",
+                "action": "shake",
+                "display_action": None,
+                "metadata": {"intent": "temperature_query"}
+            }
+
         # Movements direct mentions
         if "nod" in lower:
             return {"response": "Affirmative! Nodding in total agreement.", "emotion": "happy", "action": "nod", "metadata": {}}
