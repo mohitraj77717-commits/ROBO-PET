@@ -4,8 +4,18 @@ class RobotState {
   constructor() {
     this._listeners = new Map();
 
-    // Load persisted settings or use defaults
-    const savedBackendUrl = localStorage.getItem('robopet_backend_url') || 'http://localhost:5000';
+    // Compute dynamic default backend URL (works on both laptop and mobile)
+    let defaultBackend = 'http://localhost:5000';
+    if (typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http')) {
+      const port = window.location.port === '5000' || !window.location.port ? '5000' : window.location.port;
+      defaultBackend = `${window.location.protocol}//${window.location.hostname}:${port}`;
+    }
+    let savedBackendUrl = localStorage.getItem('robopet_backend_url') || defaultBackend;
+    // Adapt saved URL if user was previously on localhost but is now accessing from mobile via LAN IP
+    if (savedBackendUrl.includes('localhost') && typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      savedBackendUrl = savedBackendUrl.replace('localhost', window.location.hostname);
+    }
+
     const savedDemoMode = localStorage.getItem('robopet_demo_mode');
     const savedVoiceOutput = localStorage.getItem('robopet_voice_output');
     const savedSoundEffects = localStorage.getItem('robopet_sound_effects');
@@ -20,7 +30,7 @@ class RobotState {
 
       // Robot Companion
       currentEmotion: 'neutral', // 'happy' | 'sad' | 'angry' | 'sleepy' | 'neutral' | 'surprised' | 'confused'
-      currentAction: null,       // e.g. 'dance', 'wave', 'nod'
+      currentAction: null,       // e.g. 'dance', 'wave', 'nod', 'look'
       isAvatarSpeaking: false,
       isAvatarInteracting: false,
 
@@ -41,8 +51,6 @@ class RobotState {
 
       // Hardware Telemetry & Timers
       telemetry: {
-        temperature: null, // number in °C or null if unavailable
-        distance: null,    // number in cm or null if unavailable
         battery: 88,       // percentage
         timerActive: false,
         timerRemaining: 0,

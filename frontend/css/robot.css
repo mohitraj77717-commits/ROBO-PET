@@ -289,6 +289,18 @@
   75% { transform: translateX(9px) rotate(5deg); }
 }
 
+/* LOOK */
+.action-look .robot-head-group {
+  animation: robot-look 2.2s ease-in-out 1 forwards !important;
+}
+@keyframes robot-look {
+  0% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-12px) rotate(-5deg); }
+  50% { transform: translateX(12px) rotate(5deg); }
+  75% { transform: translateX(0) rotate(2deg) translateY(-4px); }
+  100% { transform: translateX(0) rotate(0) translateY(0); }
+}
+
 /* LOOK LEFT */
 .action-look_left .robot-head-group {
   animation: robot-look-left 2s ease-in-out 1 forwards !important;

@@ -94,14 +94,6 @@
           <div id="info-date-val" class="telemetry-val">---</div>
         </div>
         <div class="telemetry-row">
-          <div class="telemetry-label">🌡️ Temperature</div>
-          <div id="info-temp-val" class="telemetry-val val-unavailable">-- °C (Unavailable)</div>
-        </div>
-        <div class="telemetry-row">
-          <div class="telemetry-label">📏 Obstacle Range</div>
-          <div id="info-dist-val" class="telemetry-val val-unavailable">-- cm (Unavailable)</div>
-        </div>
-        <div class="telemetry-row">
           <div class="telemetry-label">🔋 Battery Level</div>
           <div id="info-battery-val" class="telemetry-val">88%</div>
         </div>
@@ -210,7 +202,7 @@
           <button type="button" class="suggestion-chip" data-prompt="Say hello and wave!">👋 Say Hello</button>
           <button type="button" class="suggestion-chip" data-prompt="Can you do a robot dance for me?">💃 Dance</button>
           <button type="button" class="suggestion-chip" data-prompt="Tell me a funny robot joke">😂 Tell a Joke</button>
-          <button type="button" class="suggestion-chip" data-prompt="What is the ambient temperature right now?">🌡️ Temperature</button>
+          <button type="button" class="suggestion-chip" data-prompt="Look around the room">👀 Look Around</button>
           <button type="button" class="suggestion-chip" data-prompt="Show me a happy expression">😊 Make Happy</button>
           <button type="button" class="suggestion-chip" data-prompt="Give me a quick playful roast">🔥 Roast Me</button>
         </div>
@@ -221,7 +213,7 @@
             <textarea
               id="chat-input-field"
               class="chat-input-field"
-              placeholder="Ask ROBO PET something, say 'dance', or ask for sensors..."
+              placeholder="Ask ROBO PET something, say 'dance', 'look', or 'wave'..."
               rows="1"
               aria-label="Message input"></textarea>
 
@@ -292,7 +284,6 @@
           <button class="cap-tab-btn" data-category="movements">Movements</button>
           <button class="cap-tab-btn" data-category="conversation">Conversation</button>
           <button class="cap-tab-btn" data-category="display">Display</button>
-          <button class="cap-tab-btn" data-category="sensors">Sensors</button>
           <button class="cap-tab-btn" data-category="utilities">Utilities</button>
         </div>
 
@@ -341,17 +332,9 @@
             <div class="cap-header-line"><span class="cap-name">↔️ Shake</span><span class="cap-category-badge">Movement</span></div>
             <p class="cap-desc">Shakes head horizontally in disagreement.</p>
           </div>
-          <div class="capability-card" data-category="movements" data-command="look_left">
-            <div class="cap-header-line"><span class="cap-name">⬅️ Look Left</span><span class="cap-category-badge">Movement</span></div>
-            <p class="cap-desc">Swivels gaze to the left side.</p>
-          </div>
-          <div class="capability-card" data-category="movements" data-command="look_right">
-            <div class="cap-header-line"><span class="cap-name">➡️ Look Right</span><span class="cap-category-badge">Movement</span></div>
-            <p class="cap-desc">Swivels gaze to the right side.</p>
-          </div>
-          <div class="capability-card" data-category="movements" data-command="look_center">
-            <div class="cap-header-line"><span class="cap-name">🎯 Look Center</span><span class="cap-category-badge">Movement</span></div>
-            <p class="cap-desc">Re-centers head and servo orientation.</p>
+          <div class="capability-card" data-category="movements" data-command="look">
+            <div class="cap-header-line"><span class="cap-name">👀 Look Around</span><span class="cap-category-badge">Movement</span></div>
+            <p class="cap-desc">Swivels pan and tilt servos to scan the area.</p>
           </div>
           <div class="capability-card" data-category="movements" data-command="wave">
             <div class="cap-header-line"><span class="cap-name">👋 Wave</span><span class="cap-category-badge">Movement</span></div>
@@ -360,10 +343,6 @@
           <div class="capability-card" data-category="movements" data-command="wiggle">
             <div class="cap-header-line"><span class="cap-name">🐾 Wiggle</span><span class="cap-category-badge">Movement</span></div>
             <p class="cap-desc">Playful rapid oscillation at cute capacity.</p>
-          </div>
-          <div class="capability-card" data-category="movements" data-command="stop">
-            <div class="cap-header-line"><span class="cap-name">🛑 Stop</span><span class="cap-category-badge">Movement</span></div>
-            <p class="cap-desc">Immediately halts any active servo movement.</p>
           </div>
 
           <!-- CONVERSATION -->
@@ -405,30 +384,9 @@
             <div class="cap-header-line"><span class="cap-name">📅 Show Date</span><span class="cap-category-badge">Display</span></div>
             <p class="cap-desc">Display calendar date on physical screen.</p>
           </div>
-          <div class="capability-card" data-category="display" data-command="show_temperature">
-            <div class="cap-header-line"><span class="cap-name">🌡️ Show Temp</span><span class="cap-category-badge">Display</span></div>
-            <p class="cap-desc">Display ambient degrees on robot display.</p>
-          </div>
-          <div class="capability-card" data-category="display" data-command="show_distance">
-            <div class="cap-header-line"><span class="cap-name">📏 Show Distance</span><span class="cap-category-badge">Display</span></div>
-            <p class="cap-desc">Display obstacle reading on OLED.</p>
-          </div>
-
-          <!-- SENSORS -->
-          <div class="capability-card" data-category="sensors" data-command="read_temperature" data-hardware-pending="true">
-            <div class="cap-header-line"><span class="cap-name">🌡️ Read Temp</span><span class="cap-category-badge">Sensor</span></div>
-            <p class="cap-desc">Query DHT/analog temperature sensor.</p>
-            <span class="cap-badge-pending">Hardware: ESP32</span>
-          </div>
-          <div class="capability-card" data-category="sensors" data-command="read_distance" data-hardware-pending="true">
-            <div class="cap-header-line"><span class="cap-name">📏 Read Distance</span><span class="cap-category-badge">Sensor</span></div>
-            <p class="cap-desc">Ping ultrasonic distance sensor.</p>
-            <span class="cap-badge-pending">Hardware: ESP32</span>
-          </div>
-          <div class="capability-card" data-category="sensors" data-command="check_environment" data-hardware-pending="true">
-            <div class="cap-header-line"><span class="cap-name">🌍 Environment</span><span class="cap-category-badge">Sensor</span></div>
-            <p class="cap-desc">Comprehensive telemetry diagnostics.</p>
-            <span class="cap-badge-pending">Hardware: ESP32</span>
+          <div class="capability-card" data-category="display" data-command="show_datetime">
+            <div class="cap-header-line"><span class="cap-name">📅🕒 Date & Time</span><span class="cap-category-badge">Display</span></div>
+            <p class="cap-desc">Display combined time and date on OLED.</p>
           </div>
 
           <!-- UTILITIES -->

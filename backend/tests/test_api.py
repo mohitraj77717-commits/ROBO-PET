@@ -20,9 +20,10 @@ def test_get_status_endpoint(client):
     data = json.loads(rv.data)
     assert data["status"] == "online"
     assert "esp32_connected" in data
-    assert "sensors" in data
     assert "battery" in data
     assert "timer" in data
+    assert "state" in data
+    assert "emotion" in data["state"]
 
 def test_post_talk_endpoint(client):
     payload = {"message": "Hello ROBO PET, how are you today?"}
@@ -40,6 +41,14 @@ def test_post_command_valid_movement(client):
     data = json.loads(rv.data)
     assert data["success"] is True
     assert data["action"] == "dance"
+
+    # Test look movement
+    look_payload = {"command": "look", "category": "movements"}
+    rv_look = client.post("/command", json=look_payload)
+    assert rv_look.status_code == 200
+    data_look = json.loads(rv_look.data)
+    assert data_look["success"] is True
+    assert data_look["action"] == "look"
 
 def test_post_command_valid_emotion(client):
     payload = {"command": "happy", "category": "emotions"}

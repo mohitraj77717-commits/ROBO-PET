@@ -4,7 +4,6 @@ import logging
 from typing import Dict, Any, Optional
 from backend.validator import validator
 from backend.serial_manager import SerialManager
-from backend.sensor_manager import sensor_manager
 from backend.timer_manager import timer_manager
 from backend.config import Config
 
@@ -12,11 +11,10 @@ logger = logging.getLogger("RoboPet.RobotController")
 
 class RobotController:
     def __init__(self):
-        self.sensor_mgr = sensor_manager
         self.timer_mgr = timer_manager
         
-        # Link serial manager with sensor callback
-        self.serial_mgr = SerialManager(on_telemetry_callback=self.sensor_mgr.process_incoming_telemetry)
+        # Link serial manager
+        self.serial_mgr = SerialManager()
         
         # Register timer expire callback
         self.timer_mgr.on_timer_expire = self._handle_timer_expired
@@ -25,6 +23,7 @@ class RobotController:
         self.current_emotion = "neutral"
         self.current_action: Optional[str] = None
         self.current_display = "time"
+        self.battery = Config.SIMULATED_BATTERY
 
     def _handle_timer_expired(self, label: str):
         """Called when a timer reaches 0."""
@@ -55,12 +54,19 @@ class RobotController:
         payload = {
             "type": "cmd",
             "emotion": emotion,
-            "action": action,
-            "display": display_action
+            "action": action
         }
+        if display_action:
+            payload["display"] = display_action
+
         self.serial_mgr.send_command(payload)
 
-        return ai_output
+        return {
+            "response": ai_output.get("response", ""),
+            "emotion": emotion,
+            "action": action,
+            "metadata": ai_output.get("metadata", {})
+        }
 
     def execute_command(self, command_name: str, category: Optional[str] = None) -> Dict[str, Any]:
         """
@@ -89,18 +95,17 @@ class RobotController:
             message = f"Expression set to {cmd_lower}!"
             self.serial_mgr.send_command({"type": "cmd", "emotion": emotion})
 
-        # Handle Movements
+        # Handle Movements (dance, nod, shake, look, wave, wiggle)
         elif resolved_cat == "movements":
-            action = cmd_lower
+            action = validator.validate_action(cmd_lower) or cmd_lower
             self.current_action = action
-            emotion = "happy" if cmd_lower in ("dance", "wave", "wiggle") else self.current_emotion
+            emotion = "happy" if action in ("dance", "wave", "wiggle") else self.current_emotion
             self.current_emotion = emotion
-            message = f"Performing movement: {cmd_lower.replace('_', ' ')}!"
+            message = f"Performing movement: {action.replace('_', ' ')}!"
             self.serial_mgr.send_command({
                 "type": "cmd",
                 "action": action,
-                "emotion": emotion,
-                "routine": meta.get("servo_routine", cmd_lower)
+                "emotion": emotion
             })
 
         # Handle Display Actions
@@ -109,33 +114,18 @@ class RobotController:
             message = f"ESP32 OLED Display updated: {cmd_lower.replace('_', ' ')}."
             self.serial_mgr.send_command({"type": "display", "mode": meta.get("screen_mode", cmd_lower)})
 
-        # Handle Sensor Commands
-        elif resolved_cat == "sensors":
-            readings = self.sensor_mgr.get_readings(simulate_if_missing=True)
-            if "temp" in cmd_lower:
-                message = f"Current sensor temperature: {readings.get('temperature', '--')}°C"
-                emotion = "happy"
-            elif "distance" in cmd_lower:
-                message = f"Ultrasonic distance reading: {readings.get('distance', '--')} cm"
-                emotion = "surprised"
-            else:
-                message = f"Environmental scan: Temp {readings.get('temperature')}°C, Distance {readings.get('distance')} cm"
-                emotion = "neutral"
-            self.serial_mgr.send_command({"type": "sensor_read", "sensor": meta.get("sensor", "all")})
-
         # Handle Utilities
         elif resolved_cat == "utilities":
             if cmd_lower == "reset_expression":
                 self.current_emotion = "neutral"
                 emotion = "neutral"
                 message = "Expression reset to neutral."
-                self.serial_mgr.send_command({"type": "cmd", "emotion": "neutral", "action": "look_center"})
+                self.serial_mgr.send_command({"type": "cmd", "emotion": "neutral", "action": "look"})
             elif cmd_lower == "show_battery":
-                readings = self.sensor_mgr.get_readings(simulate_if_missing=True)
-                message = f"Current battery level: {readings.get('battery', 100)}%"
+                message = f"Current battery level: {self.battery}%"
             elif cmd_lower == "status":
                 status_summary = "ESP32 Linked" if self.serial_mgr.is_connected else "ESP32 Virtual Simulation"
-                message = f"Robot Diagnostics: Status Online | {status_summary} | Battery {self.sensor_mgr.battery}%"
+                message = f"Robot Diagnostics: Status Online | {status_summary} | Battery {self.battery}%"
 
         # Handle Conversation triggers
         elif resolved_cat == "conversation":
@@ -155,18 +145,13 @@ class RobotController:
         """
         Assemble the complete status snapshot required by frontend GET /status.
         """
-        readings = self.sensor_mgr.get_readings(simulate_if_missing=True)
         timer_status = self.timer_mgr.get_status()
 
         return {
             "status": "online",
             "esp32_connected": self.serial_mgr.is_connected or self.serial_mgr.is_simulated,
             "hardware_mode": "physical" if self.serial_mgr.is_connected else "simulated",
-            "battery": readings.get("battery", 88),
-            "sensors": {
-                "temperature": readings.get("temperature"),
-                "distance": readings.get("distance")
-            },
+            "battery": self.battery,
             "timer": timer_status,
             "state": {
                 "emotion": self.current_emotion,

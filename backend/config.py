@@ -47,7 +47,5 @@ class Config:
     SERVO_TILT_MAX = int(os.getenv("SERVO_TILT_MAX", 140))
     SERVO_TILT_CENTER = int(os.getenv("SERVO_TILT_CENTER", 90))
 
-    # Sensor Telemetry Defaults (for simulated/fallback mode)
-    SIMULATED_TEMP_BASE = float(os.getenv("SIMULATED_TEMP_BASE", "24.5"))
-    SIMULATED_DIST_BASE = int(os.getenv("SIMULATED_DIST_BASE", "42"))
+    # Battery Telemetry Default
     SIMULATED_BATTERY = int(os.getenv("SIMULATED_BATTERY", "88"))

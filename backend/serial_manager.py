@@ -4,17 +4,16 @@ import json
 import logging
 import threading
 import time
-from typing import Optional, Dict, Any, Callable
+from typing import Optional, Dict, Any
 from backend.config import Config
 
 logger = logging.getLogger("RoboPet.SerialManager")
 
 class SerialManager:
-    def __init__(self, on_telemetry_callback: Optional[Callable[[Dict[str, Any]], None]] = None):
+    def __init__(self):
         self.port_name = Config.SERIAL_PORT
         self.baud_rate = Config.BAUD_RATE
         self.timeout = Config.SERIAL_TIMEOUT
-        self.on_telemetry = on_telemetry_callback
 
         self.serial_conn = None
         self.is_connected = False
@@ -24,8 +23,6 @@ class SerialManager:
         self._read_thread: Optional[threading.Thread] = None
 
         # Virtual state for simulation
-        self.virtual_pan = Config.SERVO_PAN_CENTER
-        self.virtual_tilt = Config.SERVO_TILT_CENTER
         self.virtual_expression = "neutral"
         self.virtual_action = None
 
@@ -51,7 +48,7 @@ class SerialManager:
                     baudrate=self.baud_rate,
                     timeout=self.timeout
                 )
-                time.sleep(2.0) # ESP32 reset settling time
+                time.sleep(2.0)  # ESP32 reset settling time
                 self.is_connected = True
                 self.is_simulated = False
                 self._running = True
@@ -96,28 +93,15 @@ class SerialManager:
         self._read_thread.start()
 
     def _reader_loop(self):
-        """Continuously read incoming telemetry and logs from the ESP32."""
-        buffer = ""
+        """Continuously read incoming logs or status lines from the ESP32."""
         while self._running and self.serial_conn and self.serial_conn.is_open:
             try:
                 line = self.serial_conn.readline().decode("utf-8", errors="replace").strip()
                 if line:
-                    self._handle_incoming_line(line)
+                    logger.debug(f"[ESP32 -> RX]: {line}")
             except Exception as e:
                 logger.error(f"Error reading from serial: {e}")
                 time.sleep(1.0)
-
-    def _handle_incoming_line(self, line: str):
-        """Parse incoming line as JSON telemetry or raw status string."""
-        if line.startswith("{") and line.endswith("}"):
-            try:
-                data = json.loads(line)
-                if self.on_telemetry:
-                    self.on_telemetry(data)
-                return
-            except Exception:
-                pass
-        logger.debug(f"[ESP32 RAW]: {line}")
 
     def _start_simulation(self):
         self.is_connected = False
@@ -127,7 +111,7 @@ class SerialManager:
     def send_command(self, command_payload: Dict[str, Any]) -> bool:
         """
         Send structured JSON command to ESP32 over serial.
-        Payload format: {"type": "cmd", "action": "dance", "emotion": "happy", ...}
+        Format: {"type": "cmd", "emotion": "happy", "action": "dance"}\n
         """
         raw_msg = json.dumps(command_payload) + "\n"
 
@@ -145,7 +129,6 @@ class SerialManager:
 
         if self.is_simulated:
             logger.info(f"[VIRTUAL HARDWARE SIMULATION]: {raw_msg.strip()}")
-            # Update virtual internal state
             if "emotion" in command_payload:
                 self.virtual_expression = command_payload["emotion"]
             if "action" in command_payload:

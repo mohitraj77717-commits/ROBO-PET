@@ -192,5 +192,20 @@ def create_app() -> Flask:
 app = create_app()
 
 if __name__ == "__main__":
+    import socket
+    lan_ip = "127.0.0.1"
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        lan_ip = s.getsockname()[0]
+        s.close()
+    except Exception:
+        pass
+
+    print("==================================================")
+    print("🤖 ROBO PET Backend Server Running!")
+    print(f"💻 Laptop (Local): http://localhost:{Config.PORT}")
+    print(f"📱 Mobile (Phone):  http://{lan_ip}:{Config.PORT}")
+    print("==================================================")
     logger.info(f"Starting ROBO PET Backend on http://{Config.HOST}:{Config.PORT}")
     app.run(host=Config.HOST, port=Config.PORT, debug=Config.DEBUG)

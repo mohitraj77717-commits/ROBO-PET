@@ -4,69 +4,39 @@
     "sad": { "description": "Subdued mood with drooping eyes and lowered head", "default_action": "nod" },
     "angry": { "description": "Fierce expression with red alert glow and sharp eyebrows", "default_action": "shake" },
     "sleepy": { "description": "Closed eyes with slow breathing and power-saving posture", "default_action": "stop" },
-    "neutral": { "description": "Default attentive posture with periodic natural blinking", "default_action": "look_center" },
-    "surprised": { "description": "Wide circular glowing eyes and raised head", "default_action": "look_center" },
-    "confused": { "description": "Asymmetrical eyes with curious tilted head", "default_action": "look_right" }
+    "neutral": { "description": "Default attentive posture with periodic natural blinking", "default_action": "look" },
+    "surprised": { "description": "Wide circular glowing eyes and raised head", "default_action": "look" },
+    "confused": { "description": "Asymmetrical eyes with curious tilted head", "default_action": "look" }
   },
   "movements": {
     "dance": {
       "description": "Rhythmic groove routine using dual servos",
-      "servo_routine": "dance",
       "duration_sec": 3.0,
       "requires_hardware": true
     },
     "nod": {
       "description": "Pitch head up and down in affirmation",
-      "servo_routine": "nod",
       "duration_sec": 1.5,
       "requires_hardware": true
     },
     "shake": {
       "description": "Yaw head left and right in disagreement",
-      "servo_routine": "shake",
       "duration_sec": 1.5,
       "requires_hardware": true
     },
-    "look_left": {
-      "description": "Turn yaw servo towards the left",
-      "servo_routine": "look_left",
-      "target_pan": 135,
-      "target_tilt": 90,
-      "duration_sec": 1.0,
-      "requires_hardware": true
-    },
-    "look_right": {
-      "description": "Turn yaw servo towards the right",
-      "servo_routine": "look_right",
-      "target_pan": 45,
-      "target_tilt": 90,
-      "duration_sec": 1.0,
-      "requires_hardware": true
-    },
-    "look_center": {
-      "description": "Re-center both servos to neutral baseline",
-      "servo_routine": "look_center",
-      "target_pan": 90,
-      "target_tilt": 90,
-      "duration_sec": 0.8,
+    "look": {
+      "description": "Turn yaw and tilt servos to scan surroundings",
+      "duration_sec": 2.0,
       "requires_hardware": true
     },
     "wave": {
       "description": "Playful side-to-side greeting motion",
-      "servo_routine": "wave",
       "duration_sec": 2.0,
       "requires_hardware": true
     },
     "wiggle": {
       "description": "Rapid oscillation showing excitement or joy",
-      "servo_routine": "wiggle",
       "duration_sec": 1.8,
-      "requires_hardware": true
-    },
-    "stop": {
-      "description": "Immediately halt all active servo routines",
-      "servo_routine": "stop",
-      "duration_sec": 0.1,
       "requires_hardware": true
     }
   },
@@ -84,15 +54,7 @@
   "display": {
     "show_time": { "description": "Display current digital clock on OLED", "screen_mode": "time" },
     "show_date": { "description": "Display current calendar date on OLED", "screen_mode": "date" },
-    "show_datetime": { "description": "Display combined time and date on OLED", "screen_mode": "datetime" },
-    "show_temperature": { "description": "Display ambient sensor temperature on OLED", "screen_mode": "temperature" },
-    "show_distance": { "description": "Display ultrasonic obstacle distance on OLED", "screen_mode": "distance" },
-    "show_sensor_status": { "description": "Display comprehensive telemetry on OLED", "screen_mode": "sensors" }
-  },
-  "sensors": {
-    "read_temperature": { "description": "Sample ambient temperature sensor", "sensor": "temperature", "requires_hardware": true },
-    "read_distance": { "description": "Sample HC-SR04 ultrasonic distance sensor", "sensor": "distance", "requires_hardware": true },
-    "check_environment": { "description": "Comprehensive scan of all active sensors", "sensor": "all", "requires_hardware": true }
+    "show_datetime": { "description": "Display combined time and date on OLED", "screen_mode": "datetime" }
   },
   "utilities": {
     "status": { "description": "Report comprehensive backend and hardware diagnostics" },

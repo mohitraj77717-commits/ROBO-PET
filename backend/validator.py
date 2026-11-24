@@ -1,4 +1,4 @@
-# backend/validator.py — Strict Command & Emotion Validator
+# backend/validator.py — Strict Command & Emotion Allowlist Validator
 
 import json
 from pathlib import Path
@@ -15,7 +15,7 @@ class CommandValidator:
         try:
             with open(self.commands_path, "r", encoding="utf-8") as f:
                 self.registry = json.load(f)
-        except Exception as e:
+        except Exception:
             # Fallback hardcoded defaults if file reading fails
             self.registry = {
                 "emotions": {
@@ -23,9 +23,8 @@ class CommandValidator:
                     "neutral": {}, "surprised": {}, "confused": {}
                 },
                 "movements": {
-                    "dance": {}, "nod": {}, "shake": {}, "look_left": {},
-                    "look_right": {}, "look_center": {}, "wave": {},
-                    "wiggle": {}, "stop": {}
+                    "dance": {}, "nod": {}, "shake": {}, "look": {},
+                    "wave": {}, "wiggle": {}
                 },
                 "conversation": {
                     "chat": {}, "greet": {}, "tell_joke": {}, "encourage": {},
@@ -33,11 +32,7 @@ class CommandValidator:
                     "roast_playfully": {}, "quiet_mode": {}
                 },
                 "display": {
-                    "show_time": {}, "show_date": {}, "show_datetime": {},
-                    "show_temperature": {}, "show_distance": {}, "show_sensor_status": {}
-                },
-                "sensors": {
-                    "read_temperature": {}, "read_distance": {}, "check_environment": {}
+                    "show_time": {}, "show_date": {}, "show_datetime": {}
                 },
                 "utilities": {
                     "status": {}, "reset_expression": {}, "show_battery": {}
@@ -61,15 +56,11 @@ class CommandValidator:
         return set(self.registry.get("display", {}).keys())
 
     @property
-    def valid_sensors(self) -> set:
-        return set(self.registry.get("sensors", {}).keys())
-
-    @property
     def valid_utilities(self) -> set:
         return set(self.registry.get("utilities", {}).keys())
 
     def validate_emotion(self, emotion: Optional[str]) -> str:
-        """Validate and return a safe emotion string. Defaults to 'neutral'."""
+        """Validate and return a safe emotion string from allowlist. Defaults to 'neutral'."""
         if not emotion or not isinstance(emotion, str):
             return "neutral"
         clean = emotion.strip().lower()
@@ -80,7 +71,16 @@ class CommandValidator:
         if not action or not isinstance(action, str):
             return None
         clean = action.strip().lower()
-        return clean if clean in self.valid_movements else None
+
+        # Direct match in movements allowlist (dance, nod, shake, look, wave, wiggle)
+        if clean in self.valid_movements:
+            return clean
+
+        # Safe aliases for directional looking
+        if clean in ("look_left", "look_right", "look_center"):
+            return "look"
+
+        return None
 
     def validate_display_action(self, display_action: Optional[str]) -> Optional[str]:
         """Validate display-related actions."""
@@ -100,12 +100,16 @@ class CommandValidator:
         clean_cmd = command_name.strip().lower()
         clean_cat = category.strip().lower() if category else ""
 
-        # If category is provided, check directly in that category
+        # Normalize directional look aliases
+        if clean_cmd in ("look_left", "look_right", "look_center"):
+            clean_cmd = "look"
+
+        # Check explicitly requested category
         if clean_cat and clean_cat in self.registry:
             if clean_cmd in self.registry[clean_cat]:
                 return True, clean_cat, self.registry[clean_cat][clean_cmd]
 
-        # Otherwise search across all categories
+        # Search across all allowed categories
         for cat, items in self.registry.items():
             if clean_cmd in items:
                 return True, cat, items[clean_cmd]
@@ -115,7 +119,7 @@ class CommandValidator:
     def sanitize_ai_output(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Sanitize and strictly validate AI-generated output from Gemini.
-        Ensures response, emotion, and actions meet safety requirements.
+        Ensures response, emotion, and actions strictly meet allowlist requirements.
         """
         if not isinstance(raw_data, dict):
             return {

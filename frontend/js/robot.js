@@ -167,7 +167,7 @@ class RobotCompanion {
 
     // Clear previous action classes
     const movementClasses = [
-      'action-dance', 'action-nod', 'action-shake',
+      'action-dance', 'action-nod', 'action-shake', 'action-look',
       'action-look_left', 'action-look_right', 'action-look_center',
       'action-wave', 'action-wiggle', 'action-stop'
     ];

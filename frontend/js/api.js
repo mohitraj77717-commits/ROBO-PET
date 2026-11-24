@@ -80,7 +80,6 @@ class RobotAPI {
       return {
         status: data.status || 'online',
         esp32_connected: !!data.esp32_connected,
-        sensors: data.sensors || {},
         battery: typeof data.battery === 'number' ? data.battery : null,
         timer: data.timer || null
       };
@@ -166,13 +165,9 @@ class RobotAPI {
           esp32Connected: true,
           lastPingTime: new Date()
         });
-        if (res.sensors) {
-          this.state.updateTelemetry({
-            temperature: res.sensors.temperature ?? 24.5,
-            distance: res.sensors.distance ?? 42,
-            battery: res.battery ?? 92
-          });
-        }
+        this.state.updateTelemetry({
+          battery: res.battery ?? 92
+        });
       } else {
         const isOnline = res.status === 'online';
         this.state.set({
@@ -181,17 +176,9 @@ class RobotAPI {
           lastPingTime: new Date()
         });
 
-        if (isOnline && res.sensors) {
+        if (isOnline) {
           this.state.updateTelemetry({
-            temperature: res.sensors.temperature !== undefined ? res.sensors.temperature : null,
-            distance: res.sensors.distance !== undefined ? res.sensors.distance : null,
             battery: res.battery !== undefined ? res.battery : null
-          });
-        } else if (!isOnline) {
-          // Reset sensors to null (unavailable) when offline
-          this.state.updateTelemetry({
-            temperature: null,
-            distance: null
           });
         }
       }
@@ -222,10 +209,6 @@ class RobotAPI {
     return {
       status: 'online',
       esp32_connected: true,
-      sensors: {
-        temperature: +(24 + Math.random() * 2).toFixed(1),
-        distance: Math.floor(30 + Math.random() * 35)
-      },
       battery: 92,
       mode: 'demo'
     };
@@ -255,7 +238,7 @@ class RobotAPI {
   async _mockCommandResponse(commandName, category) {
     await this._mockDelay(300, 600);
     const validEmotions = ['happy', 'sad', 'angry', 'sleepy', 'neutral', 'surprised', 'confused'];
-    const validMovements = ['dance', 'nod', 'shake', 'look_left', 'look_right', 'look_center', 'stop', 'wave', 'wiggle'];
+    const validMovements = ['dance', 'nod', 'shake', 'look', 'wave', 'wiggle'];
 
     let emotion = 'neutral';
     let action = null;
@@ -271,15 +254,9 @@ class RobotAPI {
     } else if (commandName === 'reset_expression') {
       emotion = 'neutral';
       message = 'Expression reset to neutral.';
-    } else if (commandName.startsWith('show_') || commandName.startsWith('read_')) {
-      const type = commandName.replace(/^(show_|read_)/, '');
-      if (type === 'temperature') {
-        message = `Current sensor temperature: 24.8°C`;
-        emotion = 'happy';
-      } else if (type === 'distance') {
-        message = `Ultrasonic distance sensor reading: 45 cm`;
-        emotion = 'surprised';
-      } else if (type === 'time' || type === 'date' || type === 'datetime') {
+    } else if (commandName.startsWith('show_')) {
+      const type = commandName.replace(/^show_/, '');
+      if (type === 'time' || type === 'date' || type === 'datetime') {
         message = `ESP32 OLED Display updated: ${new Date().toLocaleTimeString()}`;
         emotion = 'neutral';
       } else {
@@ -429,19 +406,12 @@ class RobotAPI {
       };
     }
 
-    // Sensor / Hardware queries
-    if (text.includes('temp') || text.includes('temperature') || text.includes('hot') || text.includes('cold')) {
+    // Look query
+    if (text.includes('look')) {
       return {
-        response: "Checking ambient temperature sensor... It's currently a pleasant 24.6°C around us!",
+        response: "Scanning around and exploring my surroundings! Everything looks great.",
         emotion: "neutral",
-        action: "look_center"
-      };
-    }
-    if (text.includes('distance') || text.includes('obstacle') || text.includes('sensor')) {
-      return {
-        response: "Ultrasonic sensor ping: Nearest obstacle detected at 42 centimeters. Path clear!",
-        emotion: "surprised",
-        action: "look_left"
+        action: "look"
       };
     }
     if (text.includes('time') || text.includes('date')) {

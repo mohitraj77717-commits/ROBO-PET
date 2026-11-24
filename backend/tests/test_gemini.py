@@ -6,7 +6,7 @@ def test_fallback_greeting():
     assert isinstance(res["response"], str)
     assert len(res["response"]) > 0
     assert res["emotion"] in ("happy", "neutral")
-    assert res["action"] in ("wave", "nod", "wiggle", "look_center", None)
+    assert res["action"] in ("wave", "nod", "wiggle", "look", None)
 
 def test_fallback_dance():
     res = gemini_service.generate_chat_response("Can you dance for me?")
@@ -18,9 +18,10 @@ def test_fallback_joke():
     assert isinstance(res["response"], str)
     assert len(res["response"]) > 10
 
-def test_fallback_sensors():
-    res = gemini_service.generate_chat_response("What is the temperature?")
-    assert res["display_action"] == "show_temperature"
+def test_fallback_look():
+    res = gemini_service.generate_chat_response("Can you look around?")
+    assert res["action"] == "look"
+    assert res["emotion"] == "neutral"
 
 def test_chat_history_recording():
     gemini_service.clear_history()

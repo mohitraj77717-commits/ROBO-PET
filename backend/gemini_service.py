@@ -21,8 +21,8 @@ You MUST ALWAYS respond with a strictly formatted JSON object with no preamble, 
 {
   "response": "Your spoken conversational response string",
   "emotion": "happy | sad | angry | sleepy | neutral | surprised | confused",
-  "action": "dance | nod | shake | look_left | look_right | look_center | wave | wiggle | stop | null",
-  "display_action": "show_time | show_date | show_datetime | show_temperature | show_distance | show_sensor_status | null",
+  "action": "dance | nod | shake | look | wave | wiggle | null",
+  "display_action": "show_time | show_date | show_datetime | null",
   "utility_action": "status | reset_expression | show_battery | null"
 }
 
@@ -32,17 +32,15 @@ Emotion Guidelines:
 - "angry": Playful indignation or mock-frustration (e.g. funny roasts, bugs, cooling fan overheating jokes).
 - "sleepy": Goodnight wishes, late-night chats, resting, power-saving mode.
 - "neutral": Standard informational replies, general facts, answering factual questions.
-- "surprised": Mind-blowing facts, unexpected news, big excitement, obstacle detection.
+- "surprised": Mind-blowing facts, unexpected news, big excitement.
 - "confused": Ambiguous questions, paradoxical logic, riddles, incomprehensible input.
 
 Action Guidelines:
-- Pick "dance" or "wiggle" for celebrations, fun, music.
+- Pick "dance" or "wiggle" for celebrations, fun, music, excitement.
 - Pick "nod" for agreement, affirmation, listening attentively.
 - Pick "shake" for disagreement, playful denial, disbelief.
 - Pick "wave" for hello, welcome, goodbye.
-- Pick "look_left" or "look_right" for curiosity or scanning surroundings.
-- Pick "look_center" to re-orient.
-- Pick "stop" when asked to freeze or be still.
+- Pick "look" for curiosity, scanning surroundings, or re-centering.
 - Otherwise use null if no physical servo movement is appropriate.
 """
 
@@ -275,25 +273,6 @@ class GeminiService:
                 "metadata": {"intent": "sleep"}
             }
 
-        # Sensors / Environment
-        if any(w in lower for w in ["temperature", "temp", "hot", "cold", "weather"]):
-            return {
-                "response": "Querying ambient temperature sensor... Environment is comfortable and optimal for operations!",
-                "emotion": "neutral",
-                "action": "look_center",
-                "display_action": "show_temperature",
-                "metadata": {"intent": "sensor_temp"}
-            }
-
-        if any(w in lower for w in ["distance", "obstacle", "range"]):
-            return {
-                "response": "Ultrasonic radar ping: Forward perimeter scanned. Navigational vectors are clear!",
-                "emotion": "surprised",
-                "action": "look_left",
-                "display_action": "show_distance",
-                "metadata": {"intent": "sensor_dist"}
-            }
-
         if any(w in lower for w in ["time", "date", "clock"]):
             from datetime import datetime
             now_str = datetime.now().strftime("%I:%M %p on %A, %B %d")
@@ -314,16 +293,14 @@ class GeminiService:
             return {"response": "Waving enthusiastically at you!", "emotion": "happy", "action": "wave", "metadata": {}}
         if "wiggle" in lower:
             return {"response": "Wiggle mode engaged at 100% capacity!", "emotion": "happy", "action": "wiggle", "metadata": {}}
-        if "look left" in lower:
-            return {"response": "Scanning to my left quadrant.", "emotion": "neutral", "action": "look_left", "metadata": {}}
-        if "look right" in lower:
-            return {"response": "Scanning to my right quadrant.", "emotion": "neutral", "action": "look_right", "metadata": {}}
+        if any(w in lower for w in ["look", "look around", "look left", "look right", "look center"]):
+            return {"response": "Scanning around and exploring the room!", "emotion": "neutral", "action": "look", "metadata": {}}
         if "look center" in lower or "center" in lower:
             return {"response": "Re-centering my gaze to you.", "emotion": "neutral", "action": "look_center", "metadata": {}}
 
         # Default conversational replies
         return {
-            "response": "Beep boop! My cognitive neural network is processing that. Tell me more, or ask me to dance, wave, or read our sensors!",
+            "response": "Beep boop! My cognitive neural network is processing that. Tell me more, or ask me to dance, wave, or check the time!",
             "emotion": "neutral",
             "action": "nod",
             "display_action": None,

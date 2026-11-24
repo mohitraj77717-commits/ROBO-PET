@@ -17,9 +17,14 @@ def test_invalid_emotion_defaults_to_neutral():
     assert validator.validate_emotion("malicious_code_injection") == "neutral"
 
 def test_valid_movements():
-    valid_moves = ["dance", "nod", "shake", "look_left", "look_right", "look_center", "wave", "wiggle", "stop"]
+    valid_moves = ["dance", "nod", "shake", "look", "wave", "wiggle"]
     for move in valid_moves:
         assert validator.validate_action(move) == move
+
+    # Directional aliases normalize to "look"
+    assert validator.validate_action("look_left") == "look"
+    assert validator.validate_action("look_right") == "look"
+    assert validator.validate_action("look_center") == "look"
 
 def test_invalid_movement_returns_none():
     assert validator.validate_action("fly") is None

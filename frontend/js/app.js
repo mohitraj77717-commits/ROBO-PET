@@ -113,8 +113,6 @@ function setupInfoPanel(state, api) {
   const infoPanel = document.getElementById('info-panel');
   const infoCloseBtn = document.getElementById('btn-info-close');
 
-  const tempVal = document.getElementById('info-temp-val');
-  const distVal = document.getElementById('info-dist-val');
   const batteryVal = document.getElementById('info-battery-val');
   const esp32Status = document.getElementById('info-esp32-status');
   const timerVal = document.getElementById('info-timer-val');
@@ -137,29 +135,6 @@ function setupInfoPanel(state, api) {
   state.subscribe(['telemetry', 'esp32Connected', 'connectionStatus', 'demoMode'], () => {
     const tele = state.get('telemetry');
     const esp32 = state.get('esp32Connected');
-    const isOnline = state.get('connectionStatus') === 'online' || state.get('demoMode');
-
-    // Temperature
-    if (tempVal) {
-      if (isOnline && tele.temperature !== null) {
-        tempVal.textContent = `${tele.temperature} °C`;
-        tempVal.classList.remove('val-unavailable');
-      } else {
-        tempVal.textContent = '-- °C (Unavailable)';
-        tempVal.classList.add('val-unavailable');
-      }
-    }
-
-    // Distance
-    if (distVal) {
-      if (isOnline && tele.distance !== null) {
-        distVal.textContent = `${tele.distance} cm`;
-        distVal.classList.remove('val-unavailable');
-      } else {
-        distVal.textContent = '-- cm (Unavailable)';
-        distVal.classList.add('val-unavailable');
-      }
-    }
 
     // Battery
     if (batteryVal) {
