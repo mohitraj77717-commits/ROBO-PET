@@ -60,7 +60,11 @@ class GeminiService:
         if self.api_key and self.api_key.strip():
             try:
                 from google import genai
-                self.client = genai.Client(api_key=self.api_key.strip())
+                from google.genai import types
+                self.client = genai.Client(
+                    api_key=self.api_key.strip(),
+                    http_options=types.HttpOptions(timeout=12000)
+                )
                 logger.info("Google GenAI client initialized successfully.")
             except Exception as e:
                 logger.warning(f"Failed to initialize Google GenAI client: {e}")
@@ -132,7 +136,7 @@ class GeminiService:
         )
 
         models_to_try = [self.model_name]
-        for fallback_m in ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-flash-latest"]:
+        for fallback_m in ["gemini-3.5-flash-lite", "gemini-3.5-flash"]:
             if fallback_m not in models_to_try:
                 models_to_try.append(fallback_m)
 
