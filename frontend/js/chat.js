@@ -159,12 +159,17 @@ class ChatController {
         this.voice.speak(result.response);
       }
     } catch (err) {
-      // Backend error - friendly message with retry
+      // Backend or network error - friendly message with retry
       console.warn('[Chat] Message failed:', err);
+      const isTimeout = err.name === 'TimeoutError' || err.message.includes('timeout') || err.message.includes('aborted');
+      const errorMsg = isTimeout 
+        ? "AI response took longer than expected! Please try again or click Retry."
+        : "I couldn't reach my brain server! Please verify your Flask backend is running on " +
+          this.state.get('backendUrl') + ", or switch to Demo Mode in Settings.";
+
       this.state.addMessage({
         sender: 'robot',
-        text: "I couldn't reach my brain server! Please verify your Flask backend is running on " +
-              this.state.get('backendUrl') + ", or switch to Demo Mode in Settings.",
+        text: errorMsg,
         isError: true,
         timestamp: new Date()
       });

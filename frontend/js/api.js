@@ -35,7 +35,7 @@ class RobotAPI {
           'Accept': 'application/json'
         },
         body: JSON.stringify({ message: message.trim() }),
-        signal: AbortSignal.timeout(12000) // 12 second timeout
+        signal: AbortSignal.timeout(30000) // 30 second timeout for AI generation
       });
 
       if (!response.ok) {
